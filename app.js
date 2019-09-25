@@ -3,10 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var cors = require(cors);
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var cors = require('cors');
+var mongoose = require('mongoose');
+var db = require('./config/db');
 
 var app = express();
 
@@ -21,8 +20,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+mongoose.connect(db.staging || db.url, {useNewUrlParser: true}).then(res => console.log('connected')).catch(err => console.log(err.message))
+
+// Models
+require('./models/Users');
+
+// Routes
+app.use(require('./routes/'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
